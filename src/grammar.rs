@@ -3,8 +3,8 @@ use crate::sequence_form::SequenceForm;
 use crate::symbol::Symbol;
 use crate::symbol_string::SymbolString;
 use crate::terminal_symbol::TerminalSymbol;
-use crate::valid_word_iterator::ValidWordIterator;
 use std::collections::BTreeMap;
+use crate::iterators::{ValidWordIterator, ValidWordIteratorStrategy};
 
 type RulesVecMap = Vec<(
     // key: (left, inner, right)
@@ -141,7 +141,7 @@ impl Grammar {
         })
     }
 
-    pub fn valid_words_iter(&self, recursion_limit: usize) -> ValidWordIterator<'_> {
-        ValidWordIterator::new(self, recursion_limit)
+    pub fn valid_words_iter(&self, strategy: ValidWordIteratorStrategy) -> ValidWordIterator<'_> {
+        ValidWordIterator::new(self, strategy)
     }
 }

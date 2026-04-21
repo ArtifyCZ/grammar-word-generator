@@ -5,7 +5,7 @@ use crate::symbol_string::SymbolString;
 use crate::valid_word::ValidWord;
 use std::collections::VecDeque;
 
-pub struct ValidWordIterator<'grammar> {
+pub(super) struct DepthFirstValidWordIterator<'grammar> {
     grammar: &'grammar Grammar,
     rules: Vec<(SequenceForm<'grammar>, Vec<SymbolString<'grammar>>)>,
     // item = (rule_idx, replacement_idx) where rule_idx is the index of the currently processed rule
@@ -15,8 +15,8 @@ pub struct ValidWordIterator<'grammar> {
     recursion_limit: usize,
 }
 
-impl<'grammar> ValidWordIterator<'grammar> {
-    pub(crate) fn new(grammar: &'grammar Grammar, recursion_limit: usize) -> Self {
+impl<'grammar> DepthFirstValidWordIterator<'grammar> {
+    pub(super) fn new(grammar: &'grammar Grammar, recursion_limit: usize) -> Self {
         let rules = grammar.rules().collect::<Vec<_>>();
         let start_rule_idx = rules
             .iter()
@@ -73,7 +73,7 @@ impl<'grammar> ValidWordIterator<'grammar> {
     }
 }
 
-impl<'grammar> Iterator for ValidWordIterator<'grammar> {
+impl<'grammar> Iterator for DepthFirstValidWordIterator<'grammar> {
     type Item = ValidWord<'grammar>;
 
     fn next(&mut self) -> Option<Self::Item> {
