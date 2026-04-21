@@ -1,4 +1,3 @@
-use std::hash::Hash;
 use crate::non_terminal_symbol::NonTerminalSymbol;
 use crate::symbol::Symbol;
 use crate::symbol_string::SymbolString;
