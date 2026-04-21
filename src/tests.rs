@@ -28,9 +28,9 @@ pub fn basic_grammar_word_generation_test() {
         rules,
         "S".to_string(),
     );
-    let words = grammar.generate_valid_words(13);
-    assert!(words.len() == 13);
-    assert!(words.iter().any(|w| w.word.iter().map(|s| s.as_str().to_string()).collect::<Vec<String>>() == vec![
+    let words = grammar.valid_words_iter(10).take(13).collect::<Vec<_>>();
+    assert_eq!(words.len(), 13);
+    assert!(words.iter().any(|w| w.symbols.iter().map(|s| s.as_str().to_string()).collect::<Vec<String>>() == vec![
         "a".to_string(),
         "slovo2".to_string(),
         "slovo2".to_string(),

@@ -1,7 +1,7 @@
 use crate::non_terminal_symbol::NonTerminalSymbol;
 use crate::terminal_symbol::TerminalSymbol;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Ord, PartialOrd, Hash)]
 pub enum Symbol<'grammar> {
     NonTerminal(&'grammar NonTerminalSymbol),
     Terminal(&'grammar TerminalSymbol),

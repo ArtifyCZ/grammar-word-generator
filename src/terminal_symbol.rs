@@ -1,6 +1,6 @@
 use crate::symbol::Symbol;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Ord, PartialOrd, Hash)]
 pub struct TerminalSymbol {
     pub value: String,
 }

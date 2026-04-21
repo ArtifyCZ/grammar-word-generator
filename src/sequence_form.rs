@@ -1,8 +1,9 @@
+use std::hash::Hash;
 use crate::non_terminal_symbol::NonTerminalSymbol;
 use crate::symbol::Symbol;
 use crate::symbol_string::SymbolString;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Ord, PartialOrd)]
 pub struct SequenceForm<'grammar> {
     /// left part `α` where `a` is a string of non-terminal and terminal symbols
     pub left: SymbolString<'grammar>,

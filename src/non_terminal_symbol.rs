@@ -1,6 +1,6 @@
 use crate::symbol::Symbol;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Ord, PartialOrd, Hash, Clone)]
 pub struct NonTerminalSymbol {
     pub value: String,
 }

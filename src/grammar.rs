@@ -3,6 +3,7 @@ use crate::sequence_form::SequenceForm;
 use crate::symbol::Symbol;
 use crate::symbol_string::SymbolString;
 use crate::terminal_symbol::TerminalSymbol;
+use crate::valid_word_iterator::ValidWordIterator;
 use std::collections::BTreeMap;
 
 type RulesVecMap = Vec<(
@@ -39,12 +40,6 @@ pub struct Grammar {
     pub(crate) terminals: Vec<TerminalSymbol>,
     pub(crate) rules: RulesVecMap,
     pub(crate) start_symbol: NonTerminalSymbol,
-}
-
-#[derive(Debug)]
-pub struct ValidWord {
-    pub word: Vec<TerminalSymbol>,
-    pub path: Vec<Vec<String>>,
 }
 
 fn parse_sequence_form(
@@ -117,9 +112,7 @@ impl Grammar {
         None
     }
 
-    pub fn rules<'grammar>(
-        &'grammar self,
-    ) -> impl Iterator<Item = (SequenceForm<'grammar>, Vec<SymbolString<'grammar>>)> {
+    pub fn rules(&self) -> impl Iterator<Item = (SequenceForm<'_>, Vec<SymbolString<'_>>)> {
         self.rules.iter().map(|(pattern, replacements)| {
             let (left_raw, inner, right_raw) = pattern;
             let left = SymbolString {
@@ -148,61 +141,7 @@ impl Grammar {
         })
     }
 
-    pub fn generate_valid_words(&self, limit: usize) -> Vec<ValidWord> {
-        let start_string = SymbolString::new_single(Symbol::NonTerminal(&self.start_symbol));
-        let mut remaining_till_limit = limit;
-        find_all_valid_words(self, start_string, vec![], &mut remaining_till_limit, 0)
+    pub fn valid_words_iter(&self, recursion_limit: usize) -> ValidWordIterator<'_> {
+        ValidWordIterator::new(self, recursion_limit)
     }
-}
-
-fn find_all_valid_words<'grammar>(
-    grammar: &'grammar Grammar,
-    current_string: SymbolString<'grammar>,
-    current_path: Vec<SequenceForm<'grammar>>,
-    remaining_till_limit: &mut usize,
-    recursion_depth: usize,
-) -> Vec<ValidWord> {
-    if *remaining_till_limit == 0 {
-        return vec![];
-    }
-    if recursion_depth > 10 {
-        return vec![];
-    }
-    if current_string.symbols().all(|s| s.is_terminal()) {
-        *remaining_till_limit -= 1;
-        return vec![ValidWord {
-            word: current_string
-                .symbols()
-                .map(|s| match s {
-                    Symbol::NonTerminal(_) => panic!("Expected terminal symbol"),
-                    Symbol::Terminal(s) => TerminalSymbol {
-                        value: s.value.clone(),
-                    },
-                })
-                .collect(),
-            path: current_path
-                .into_iter()
-                .map(|seq_form| seq_form.symbols().map(|s| s.as_str().to_string()).collect())
-                .collect(),
-        }];
-    }
-    let mut valid_words = Vec::new();
-    for (rule_pattern, rule_replacements) in grammar.rules() {
-        let pattern_symbols = rule_pattern.symbols().collect::<Vec<_>>();
-        let mut new_path = current_path.clone();
-        new_path.push(rule_pattern);
-        for rule_replacement in rule_replacements {
-            let Some(new_string) =
-                current_string.replace_once(pattern_symbols.as_slice(), &rule_replacement)
-            else {
-                break;
-            };
-            let new_valid_words = find_all_valid_words(grammar, new_string, new_path.clone(), remaining_till_limit, recursion_depth + 1);
-            valid_words.extend(new_valid_words);
-            if *remaining_till_limit == 0 {
-                return valid_words;
-            }
-        }
-    }
-    valid_words
 }
